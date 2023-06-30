@@ -1,0 +1,139 @@
+//
+// Algorithms for Rigorous Computation of Higher Transcendental functions.
+//
+
+Copyright (C) 2011--2014 University of Bristol, UK
+  and     (C) 2011--2014 University of Uppsala, Sweden
+---------------------------------------------------------------
+    This file is part of archt.
+
+    archt is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    archt is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with archt.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Authors
+-------
+Andrew R. Booker, Andreas Strombergsson, Holger Then
+
+
+Purpose
+-------
+Rigorous multi-precision computation of higher transcendental functions.
+  reasonably fast -- All computations are tightly bounded.
+  rigorous        -- Multi-precision interval arithmetic is used along with
+                     rigorous error bounds.
+  easy to use     -- The user specifies the desired precision while the
+                     algorithm determines automatically the required bounds.
+  fairly general  -- For instance lngamma works for any complex argument,
+                     including poles and branch cut.
+
+
+Version: 1.0.3 (15 May 2014)
+----------------------------
+archt.tgz includes the following files (which depend on each other).
+  COPYING     -- A copy of the GNU General Public License.
+  README      -- Some instructions for the use of archt.
+  archt.c     -- The archt header.
+  bernoulli.c -- Algorithms for computing and tabulating Bernoulli numbers.
+  kbessel.c   -- Algorithm for computing K-Bessel of purely imaginary order.
+  lngamma.c   -- Algorithm for computing lngamma and gamma for complex argument.
+  primes.c    -- Euler sieve for computing and tabulating primes.
+
+
+Installing archt (for Linux)
+----------------------------
+Download archt.tgz into an empty directory and unpack via
+  tar -xzf archt.tgz
+
+If not done already, you need to install
+  GMP, http://gmplib.org/
+  MPFR, http://www.mpfr.org/
+  MPFI, https://gforge.inria.fr/projects/mpfi/
+
+
+Using archt (for Linux)
+-----------------------
+Here we describe the use of lngamma. The other routines are used similarly.
+To test lngamma quickly, type 'sh lngamma.c' into your shell.
+
+You can include lngamma into your own program. Here is a demo.
+
+  #include"lngamma.c"
+  int main() {
+    unsigned long d=53,n;
+    mpfi_ptr f; mpfi_t Re_z,Im_z;
+    f=init_lngamma(d); if(f!=(mpfi_ptr)0) {
+      mpfi_init2(Re_z,mpfi_get_prec(f));
+      mpfi_init2(Im_z,mpfi_get_prec(f));
+      for(n=0;n<10;n++) {
+        mpfi_set_ui(Re_z,n); mpfi_set_ui(Im_z,0l); lngamma(f,Re_z,Im_z);
+        printf("lngamma(%lu+I*0.)=",n); mpfi_out_str(stdout,10,0,f);
+        printf("+I*"); mpfi_out_str(stdout,10,0,f+1); printf("\n");
+      }
+      mpfi_clear(Im_z); mpfi_clear(Re_z); clear_lngamma(f);
+    } else printf("init_lngamma(d) failed.\n",d);
+    return 0;
+  }
+
+For another example, see the main() of lngamma.c.
+
+The compiler options are: -lm -lgmp -lmpfr -lmpfi
+For code optimization we encourage to use -O2, but not -O3.
+
+
+Need I formally cite archt in my paper?
+---------------------------------------
+If you have used archt in the preparation of a paper, then yes, we would
+appreciate that.
+
+When an author formally cites the use of a computer algebra system or package
+in the bibliography of a paper, then system developers receive credit in
+citation indices. This practice encourages development of systems and packages
+and helps provide recognition for this work that is similar to that enjoyed by
+those who publish research articles. It also makes your experimental results
+reproducible.
+
+Please cite archt as follows
+----------------------------
+A. R. Booker, A. Strombergsson, and H. Then,
+Bounds and algorithms for the K-Bessel function of imaginary order,
+LMS J. Comp. Math. 16 (2013) 78--108.
+
+
+Feedback
+--------
+Feedback is most welcome.
+Let me also know of any benchmark results.
+
+
+Discovering a bug
+-----------------
+Should you discover a bug in archt, please sent a bug report to
+holger DOT then AT bristol DOT ac DOT uk.
+
+
+Acknowledgements
+----------------
+We thank the authors, developers, and contributors of the following software
+packages
+  GMP, http://gmplib.org/
+  MPFR, http://www.mpfr.org/
+  MPFI, https://gforge.inria.fr/projects/mpfi/
+Without these software packages, archt would not have seen the light of the day.
+
+Further thanks are due to the authors, developers, and contributors of
+  Debian, http://www.debian.org/
+  GCC, http://gcc.gnu.org/
+  PARI/GP, http://pari.math.u-bordeaux.fr/
+These operating system and software packages simplified our life a lot when
+writing and testing archt.
