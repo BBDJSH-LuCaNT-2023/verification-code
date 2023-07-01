@@ -889,7 +889,6 @@ static void class_number_sums(const char *dir) {
 	int32_t i;
 
 	for (i=proc;i<ncgfiles;i+=nprocs) {
-if (!proc) fprintf(stderr,"file %d/%d\n",i,ncgfiles);
 		sprintf(buf,"%s/%s",dir,cgfile[i]->d_name);
 		if ( !(fp=gzopen(buf,"r")) ) {
 			fprintf(stderr,"failed to open %s for reading\n",buf);
@@ -904,7 +903,6 @@ static int filter_hidden_files(const struct dirent *f) {
 	return f->d_name[0] != '.';
 }
 
-#include <time.h>
 int main(int argc,char *argv[]) {
 	if (argc != 3
 	|| (nmffiles=scandir(argv[1],&mffile,filter_hidden_files,alphasort)) < 0
@@ -913,34 +911,23 @@ int main(int argc,char *argv[]) {
 		return 0;
 	}
 
-time_t t0 = time(NULL);
-fprintf(stderr,"initializing\n");
 	binomial_table();
 	factor_table();
 	hurwitz_table();
 	coeff_arrays();
 
-#if 1
 	mkdtemp(temp_dir);
 	atexit(remove_temp_dir);
 	signal(SIGTERM,exit);
 
 	for (proc=0;proc<nprocs;proc++)
 	if (!fork()) {
-if (!proc) fprintf(stderr,"[%d] calling spectral_terms\n",(int)(time(NULL)-t0));
 		spectral_terms(argv[1]);
-if (!proc) fprintf(stderr,"[%d] calling geometric_terms\n",(int)(time(NULL)-t0));
 		geometric_terms();
-if (!proc) fprintf(stderr,"[%d] calling class_number_sums\n",(int)(time(NULL)-t0));
 		class_number_sums(argv[2]);
-if (!proc) fprintf(stderr,"[%d] calling print_traces\n",(int)(time(NULL)-t0));
 		print_traces();
 		_exit(0);
 	}
-#else
-	strcpy(temp_dir,"/tmp/trace_LQeZeM");
-#endif
 	collate();
-fprintf(stderr,"[%d] finished\n",(int)(time(NULL)-t0));
 	return 0;
 }
